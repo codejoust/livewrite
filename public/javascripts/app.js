@@ -1,4 +1,16 @@
 
+function handle_backspace(input_text){
+	var out_text = [];
+	for (var i = 0, l = input_text.length; i < l; i++){
+		if (input_text[i] == '\b'){
+			out_text.pop();
+		} else {
+			out_text.push(input_text[i]);
+		}
+	}
+	return out_text.join('');
+}
+
 function LineWriterFunc(){
 	this.curline_text = '';
 	this.curline_timing = [];
@@ -25,7 +37,7 @@ function LineWriterFunc(){
 		this.last_time = new Date().getTime();
 	}
 	this.getCurline = function(){
-		return this.curline_text.replace(new RegExp('.\b'), '');
+		return handle_backspace(this.curline_text);
 	}
 }
 
@@ -50,7 +62,7 @@ function LineReplayFunc(lines_text, lines_timing, container){
 			this.curchar = 0;
 			return false;
 		} else {
-			return this.lines_text[this.curline].slice(0, this.curchar++).replace(new RegExp('.\b'), '');
+			return handle_backspace(this.lines_text[this.curline].slice(0, this.curchar++));
 
 		}
 	}
@@ -125,7 +137,7 @@ $(function(){
 				evt.target.value = '';
 				setTimeout(function(){
 					var change_value = evt.target.value;
-					if (change_value == ''){ change_value = '\b'; }
+					if (change_value == '' && evt.keyCode == 8){ change_value = '\b'; }
 					LineWriter.addChar(change_value);
 					getp('#curline .text').html(LineWriter.getCurline());
 				}, 2);

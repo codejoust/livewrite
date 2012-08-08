@@ -16,8 +16,8 @@ a {
   display: none;
 }
 #new_post #cursor.active {
-  display: static;
+  visibility: normal;
 }
 #new_post #cursor.inactive {
-  display: none;
+  visibility: hidden;
 }
