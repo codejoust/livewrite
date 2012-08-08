@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  h1 LiveWrite
+  
+  h2 Writing
+
+  .writing.single
+    h3= writing.title
+    .body loading...
+    .actions
+      a(href='/writing/'+writing.id+'/plus') +
+      span.space 
+      a(href='/writing/'+writing.id+'/heart') ♥
+
+  script(type='text/javascript')!= 'render_writing(' + JSON.stringify(writing) + ', ".writing.single .body", true);'

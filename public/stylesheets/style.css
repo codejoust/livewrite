@@ -1,0 +1,23 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+a {
+  color: #00B7FF;
+}
+#new_post input.text_in {
+  opacity: 0;
+  display: block;
+}
+#new_post button.save {
+  background: transparent;
+  border: 0 none;
+  font-size: 14px;
+  display: none;
+}
+#new_post #cursor.active {
+  display: static;
+}
+#new_post #cursor.inactive {
+  display: none;
+}

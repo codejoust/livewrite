@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1 LiveWrite
+  
+  h3 Write
+
+  .write_block#new_post
+    div(contenteditable='true', class='title') untitled.
+    .text#writetext
+      p#curline.line
+        span.text
+        span#cursor &#9614;
+    input.text_in/
+    button.save save.
