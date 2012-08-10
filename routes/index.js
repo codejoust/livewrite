@@ -18,8 +18,8 @@ var WritingS = new mongoose.Schema({
 	title:  String,
 	body:  [String],
 	live: {
-		keys:  [String],
-		time:  []
+		keys:  String,
+		time:  [Number]
 	},
 	created_at:  Date,
 	created_ip:  String,
@@ -41,12 +41,8 @@ exports.add_writing = function(req, res){
   writing.title = req.body.title;
   writing.body  = req.body.text;
   writing.live.keys  = req.body.live.keys;
-  req.body.live.time.forEach(function(live_line){
-    var line_num = [];
-    live_line.forEach(function(line_item){
-      line_num.push(parseInt(line_item));
-    });
-    writing.live.time.push(line_num);
+  req.body.live.time.forEach(function(line_item){
+    writing.live.time.push(parseInt(line_item));
   });
   writing.created_at = new Date();
   writing.created_ip = get_ip(req);
