@@ -25,6 +25,7 @@ var WritingS = new mongoose.Schema({
 	created_ip:  String,
 	is_finished: Boolean,
 	sess_id:     String,
+  json_schama: Number,
 	views:       {type: Number, default: 0},
 	plusses:     {type: Number, default: 0},
 	tags:        [String]
@@ -47,6 +48,7 @@ exports.add_writing = function(req, res){
   writing.created_at = new Date();
   writing.created_ip = get_ip(req);
   writing.is_finished = true;
+  writing.json_schema = 1.2;
   writing.save(function(err){
     res.send({err: err, id: writing._id});
   });
@@ -67,7 +69,9 @@ exports.get_writing = function(req, res){
 };
 
 exports.list_writings = function(req, res){
-  
+  Writing.find({}, 'title id', function(err, docs){
+    res.render('list_writings', {writings: docs});
+  });
 };
 
 

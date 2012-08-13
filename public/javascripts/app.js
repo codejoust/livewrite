@@ -10,7 +10,7 @@ function format_text(input_text){
 			out_text.push(input_text[i]);
 		}
 	}
-	out_text.push('</p>');
+	out_text.push('<span id="cursor">&#9614;</span></p>');
 	return out_text.join('');
 }
 
