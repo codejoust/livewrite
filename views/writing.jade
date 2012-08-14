@@ -1,16 +1,28 @@
 extends layout
 
 block content
-  h1 LiveWrite
-  
-  h2 Writing
+  h3.intro Writing
 
-  .writing.single
+  .writing.single(mid=writing.id)
     h3= writing.title
     .body loading...
-    .actions
-      a(href='/writing/'+writing.id+'/plus') +
-      span.space 
-      a(href='/writing/'+writing.id+'/heart') ♥
+    .actions.toolbar
+      .act
+        a(href='/writing/'+writing.id+'/heart') ♥ it.
+      .act.sep |
+      .act
+        a(href='/writing/'+writing.id+'/share') share it.
+      .act.sep |
+      .act
+        span.views_counter= writing.views 
+        span  views
+      .act.sep |
+      .act
+        span.speed.selected(speed='1') 1x 
+        span.speed(speed='1.5') 1.5x 
+        span.speed(speed='2') 2x 
+        span.speed(speed='5') 5x
+
+
 
   script(type='text/javascript')!= 'render_writing(' + JSON.stringify(writing) + ', ".writing.single .body", true);'

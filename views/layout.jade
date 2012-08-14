@@ -3,7 +3,28 @@ html
   head
     title= typeof(title) != 'undefined' ? title : 'livewrite'
     link(rel='stylesheet', href='/stylesheets/style.css')
-    script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+    #script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js')
+    script(type='text/javascript', src='/javascripts/jquery-1.7.1.min.js')
     script(type='text/javascript', src='/javascripts/app.js')
   body
-    block content
+    .header
+      h1.main 
+        a(href='/') LiveWrite
+      ul.nav 
+        li
+          a(href='/about') About
+        li.sep |
+        li
+          a(href='/me') You
+        li.sep |
+        li
+          a(href='/writings') Writings
+      ul.recent.hide
+        li
+          a(href='#') black snow
+        li
+          a(href='#') seafaring west
+        li
+          a(href='#') blew / blown
+    .container
+      block content

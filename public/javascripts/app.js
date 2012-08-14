@@ -43,6 +43,7 @@ function LineReplayFunc(writing_text, writing_timing, container){
 	this.writing_timing = writing_timing;
 	this.text_buffer = '';
 	this.curchar = 0;
+	this.speed = 1;
 	this.container = $(container);
 
 	this.advance = function(){
@@ -57,23 +58,33 @@ function LineReplayFunc(writing_text, writing_timing, container){
 	this.update_html = function(){
 		var new_line = self.advance();
 		if (new_line == true) {
+			$.post('/writing/'+$('.writing').attr('mid')+'/view', function(){
+				$('.views_counter').html(writing.views + 1);
+			});
+
 			self.container.append('<p><small>done.</small</p>');
 			return false;
 		} else {
 			self.element.html(new_line);
 		}
-		setTimeout(self.update_html, self.writing_timing[self.curchar]);
+		setTimeout(self.update_html, Math.floor(self.writing_timing[self.curchar] * (1/self.speed)) );
 	}
 
 	this.go_html = function(element){
 		this.element = $('<div class="writing_out"></div>');
 		this.element.appendTo(this.container);
+		$('.speed').click(function(){
+			$('.speed').removeClass('selected');
+			$(this).addClass('selected');
+			self.speed = parseFloat($(this).attr('speed'));
+		})
 		this.update_html();
 	}
 
 }
 
 window.render_writing = function(writing, selector, autoplay){
+	window.writing = writing;
 	window.line_replay = new LineReplayFunc(writing.live.keys, writing.live.time, selector);
 	$(selector).html('');
 	if (autoplay){
@@ -92,23 +103,31 @@ $(function(){
 
 	if ($('#new_post').length){
 
+
 		var LineWriter = new LineWriterFunc();
 		window.LineWriter = LineWriter;
 
 		var cursor = document.getElementById('cursor');
-		setInterval(function(){
-			cursor.className = (cursor.className == 'active') ? 'inactive' : 'active';
-		}, 700);
+		if (cursor){
+			setInterval(function(){
+				cursor.className = (cursor.className == 'active') ? 'inactive' : 'active';
+			}, 700);
+		}
 
 		var getp = function(sel){ return $('#new_post').find(sel); }
 		  , focus_textin = function(){
 			getp('input.text_in').focus();
 		};
+
+		getp('button.clear').click(function(){
+			window.location.reload();
+		});
+
 		getp('.text').click(focus_textin);
 		getp('.title').blur(focus_textin);
 		getp('.writetext').click(focus_textin);
 		getp('input.text_in').focus(function(evt){
-			getp('button.save').show('fast');
+			getp('.buttons').show('fast');
 		})
 		getp('input.text_in').keydown(function(evt){
 			if (false && evt.keyCode == 13){
@@ -138,7 +157,7 @@ $(function(){
 			getp('.line').each(function(){
 				lines.push($(this).text());
 			});
-			$.post('/writing', {text: lines, title: $('.title').text(), live: LineWriter.liveHash() }, function(data){
+			$.post('/writing', {text: lines, title: $('.title').val(), live: LineWriter.liveHash() }, function(data){
 				alert('saved with id:  ' + JSON.stringify(data));
 				window.location.href = '/writing/' + data.id + '/';
 			})
@@ -146,4 +165,3 @@ $(function(){
 
 	}
 });
-

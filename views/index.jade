@@ -1,13 +1,14 @@
 extends layout
 
 block content
-  h1 LiveWrite
   
-  h3 Write
+  h3.intro Write
 
   .write_block#new_post
-    div(contenteditable='true', class='title') untitled.
+    input(type='text', class='title', placeholder='untitled.')/
     .text#writetext
       .writer_out
     input.text_in/
-    button.save save.
+    .buttons.toolbar
+        button.save save.
+        button.clear restart.

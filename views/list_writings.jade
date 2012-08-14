@@ -1,6 +1,11 @@
+extends layout
 
 
-.writings
-  - for writing in writings
-    h3
-      a(href='/writing/' + writing.id)=writing.title
+block content
+
+  h3.intro All Writings
+
+  .writings
+    - for writing in writings
+      h3
+        a(href='/writing/' + writing.id)=writing.title

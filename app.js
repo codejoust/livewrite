@@ -19,7 +19,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({secret: 'aw4tji4#TALKASDnaergawreILRAEIJAalwker'}));
+  //app.use(express.session({secret: 'aw4tji4#TALKASDnaergawreILRAEIJAalwker'}));
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -29,12 +29,16 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-/* API Mappings */
-app.get('/',                 routes.index);
-app.post('/writing',         routes.add_writing);
-app.get('/writing/:id',      routes.get_writing);
-app.get('/writing/:id.json', routes.get_writing);
-app.get('/writings',         routes.list_writings);
+/* Site Mappings */
+app.get( '/',                   routes.index);
+app.get( '/about',              routes.about);
+app.post('/writing',            routes.add_writing);
+app.get( '/writing/:id',        routes.get_writing);
+app.post('/writing/:id/view',   routes.view_writing);
+app.post('/writing/:id/heart',  routes.heart_writing);
+app.get( '/writing/:id.json',   routes.get_writing);
+app.get( '/writings',           routes.list_writings);
+app.get( '/me',                 routes.me);
 
 
 http.createServer(app).listen(app.get('port'), function(){

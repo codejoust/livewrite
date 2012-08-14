@@ -1,0 +1,11 @@
+extends layout
+
+block content
+
+  h3.intro You
+
+  p You've written:
+    ul 
+      - for writing in writings
+        li
+          a(href='/writing/'+writing.id)= writing.title || 'untitled.'

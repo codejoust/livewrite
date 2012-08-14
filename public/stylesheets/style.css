@@ -1,19 +1,133 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: url(../images/dust.png);
+}
+body,
+html,
+div {
+  margin: 0;
+  padding: 0;
 }
 a {
   color: #00B7FF;
+}
+body {
+  font-family: 'Helvetica Neue', Helvetica;
+}
+.hide {
+  display: none;
+}
+.sep {
+  color: #aaa;
+}
+.header h1.main {
+  text-align: center;
+  border-bottom: 1px dotted #aaa;
+  padding-top: 30px;
+  padding-bottom: 10px;
+  width: 400px;
+  margin: 0 auto;
+}
+.header h1.main a {
+  color: inherit;
+  text-decoration: none;
+}
+.header ul {
+  padding-left: 0;
+  font-weight: 300;
+  clear: both;
+  text-align: center;
+}
+.header ul strong {
+  font-weight: 400;
+}
+.header ul li {
+  list-style: none;
+  list-style-type: none;
+  display: inline-block;
+  padding: 6px;
+}
+.header ul li a {
+  color: #444;
+  text-decoration: none;
+}
+h1,
+h3 {
+  font-family: 'Helvetica Neue', Helvetica, sans-serif;
+  letter-spacing: 0.08em;
+  font-weight: 300;
+}
+.container {
+  width: 800px;
+  margin: 0 auto;
+  margin-top: 30px;
+  background: #fff;
+  border: 0 2px solid black;
+  padding: 10px;
+  padding-bottom: 30px;
+  position: relative;
+}
+.container h3.intro {
+  margin-top: 0;
+}
+.toolbar {
+  position: absolute;
+  bottom: -30px;
+  height: 32px;
+  width: 800px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.3);
+}
+.writing .toolbar {
+  margin-top: 8px;
+}
+.writing .toolbar .act {
+  display: inline-block;
+  padding-top: 8px;
+  padding-left: 8px;
+}
+.writing .toolbar .act a {
+  color: #46579e;
+  text-decoration: none;
+}
+.writing .toolbar .speed.selected {
+  text-decoration: underline;
+}
+.writing .toolbar .speed {
+  cursor: pointer;
+}
+#new_post input.title {
+  font-size: 14px;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 320px;
+}
+#new_post input.title:active,
+#new_post input.title:focus {
+  border-bottom: 1px solid #bbb;
+  outline: 0;
+}
+#new_post .line:last-child {
+  color: #222;
+}
+#new_post .line {
+  color: #666;
 }
 #new_post input.text_in {
   opacity: 0;
   display: block;
 }
-#new_post button.save {
+#new_post .buttons {
+  display: none;
+}
+#new_post .buttons button.save,
+#new_post .buttons button.clear {
   background: transparent;
   border: 0 none;
   font-size: 14px;
-  display: none;
+  color: #8d96bc;
 }
 #new_post #cursor.active {
   visibility: normal;
