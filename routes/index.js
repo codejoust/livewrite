@@ -131,6 +131,10 @@ exports.about = function(req, res){
 
 exports.me = function(req, res){
   fetch_user(req, false, function(err, user){
+    if (!user){
+      res.render('you', {user: null, writings: null, found:false});
+      return;
+    }
     Writing.find({author: user._id}, function(err, writings){
       res.render('you', {user: user, writings: writings})
     })
@@ -138,20 +142,13 @@ exports.me = function(req, res){
 }
 
 exports.view_writing = function(req, res){
-  try {
-    Writing.findById(req.params.id, function(err, doc){
-      if (err){ throw err; }
-      if (!err && doc){
-        doc.views += 1;
-        doc.save(function(err, doc){
-          if (err){ throw err; }
-          res.send({err: false, updated: true})
-        })
-      }
-    })
-  } catch (e){
-    res.send({err: e});
-  }
+  Writing.findOneAndUpdate({_id: req.params.id}, {'$inc': {views: 1}}, function(err, doc){
+    if (err){
+      res.send({err: err, writing: null});
+    } else {
+      res.send({err: false, writing: doc, updated: true})
+    }
+  });
 }
 
 exports.get_writing = function(req, res){
