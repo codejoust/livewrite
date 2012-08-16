@@ -36,10 +36,12 @@ app.post('/writing',            routes.add_writing);
 app.get( '/writing/:id',        routes.get_writing);
 app.post('/writing/:id/view',   routes.view_writing);
 app.post('/writing/:id/heart',  routes.heart_writing);
+app.post('/writing/:id/update', routes.update_writing);
 app.get( '/writing/:id.json',   routes.get_writing);
 app.get( '/writings',           routes.list_writings);
 app.get( '/me',                 routes.me);
-app.post('/me/username',        routes.save_my_username);
+app.post('/me/pen_name',        routes.save_profile_opts);
+app.post('/me/username',        routes.save_profile_opts);
 
 
 http.createServer(app).listen(app.get('port'), function(){

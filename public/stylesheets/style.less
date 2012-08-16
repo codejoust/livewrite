@@ -73,6 +73,7 @@ h1, h3 {
 	background: #fff;
 	border: 0 2px solid black;
 	padding: 10px;
+	min-height: 300px;
 	padding-bottom: 30px;
 	position: relative;
 	h1 {
@@ -80,6 +81,10 @@ h1, h3 {
 	}
 	h3.intro {
 		margin-top: 0;
+	}
+	.writing_admin {
+		width: 260px;
+		float: right;
 	}
 }
 
@@ -90,6 +95,32 @@ h1, h3 {
 	width: 800px;
 	margin: 0 auto;
 	background: rgba(255,255,255,0.3);
+}
+
+.user_options { 
+	float:right;
+	width: 270px;
+}
+fieldset {
+	border: 2px #eee solid;
+}
+
+.writings {
+	li {
+		float:left;
+		list-style: none;
+		padding: 5px;
+		a {
+			font-size: 13px;
+		}
+		.author {
+			color:#666;
+			font-size: 11px;
+			&:before{
+				content:'~ ';
+			}
+		}
+	}	
 }
 
 .writing .toolbar {

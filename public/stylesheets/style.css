@@ -64,11 +64,16 @@ h3 {
   background: #fff;
   border: 0 2px solid black;
   padding: 10px;
+  min-height: 300px;
   padding-bottom: 30px;
   position: relative;
 }
 .container h3.intro {
   margin-top: 0;
+}
+.container .writing_admin {
+  width: 260px;
+  float: right;
 }
 .toolbar {
   position: absolute;
@@ -77,6 +82,28 @@ h3 {
   width: 800px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.3);
+}
+.user_options {
+  float: right;
+  width: 270px;
+}
+fieldset {
+  border: 2px #eee solid;
+}
+.writings li {
+  float: left;
+  list-style: none;
+  padding: 5px;
+}
+.writings li a {
+  font-size: 13px;
+}
+.writings li .author {
+  color: #666;
+  font-size: 11px;
+}
+.writings li .author:before {
+  content: '~ ';
 }
 .writing .toolbar {
   margin-top: 8px;

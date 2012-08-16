@@ -16,6 +16,36 @@ function get_ip(req){
   }
 }
 
+function ProcJoin(){
+  this.returns = 0;
+  this.err = null;
+  this.callback = null;
+  this.outputs = [];
+  var self = this;
+
+  this.add_fn = function(name){
+    this.returns += 1;
+    return function(fn_err, data){
+      self.outputs[name] = data;
+      if (self.err){
+        return false;
+      } else if (fn_err){
+        self.callback(err, self.outputs);
+        self.err = true;
+      } else if (self.callback && self.returns-- == 1){
+        self.callback(null, self.outputs);
+      } else {
+        self.outputs[name] = data;
+      }
+    }
+  }
+  this.join = function(callback){
+    self.callback = callback;
+  }
+}
+
+
+
 var WritingS = new mongoose.Schema({
 	title:  String,
 	body:  [String],
@@ -26,11 +56,12 @@ var WritingS = new mongoose.Schema({
 	created_at:  Date,
 	created_ip:  String,
 	is_finished: Boolean,
-	sess_id:     String,
+  is_public:   {type: Boolean, default: false},
+  pen_name:    String,
   json_schama: Number,
   author:   mongoose.Schema.ObjectId,
 	views:       {type: Number, default: 0},
-	hearts:     {type: Number, default: 0},
+	hearts:      {type: Number, default: 0},
 	tags:        [String]
 });
 var Writing = mongoose.model('Writing', WritingS);
@@ -42,6 +73,7 @@ var UserS = new mongoose.Schema({
   created_ip: String,
   last_ip: String,
   realname: String,
+  pen_name: String,
   username: {type: String, unique: true},
   bio: String,
   hearts: [mongoose.Schema.ObjectId],
@@ -74,25 +106,29 @@ function create_writing(req, res, user){
   });
 }
 
+
+
 exports.heart_writing = function(req, res){
+  var cb_join = new ProcJoin();
   try {
     var action = 'unknown';
     fetch_user(req, true, function(err, user){
       if (err){ throw err; }
       Writing.findById(req.params.id, function(err, writing){
         if (err){ throw err; }
-        if (_.include(user.hearts, writing._id)){
-          delete user.hearts[user.hearts.indexOf(writing.id)];
-          writing.hearts -= 1;
+        if (user.hearts.indexOf(writing._id) != -1){
+          user.update({"$pull": {hearts: writing._id}}, {}, cb_join.add_fn('rm_hearts'));
+          writing.update({"$inc": {hearts: -1}}, {}, cb_join.add_fn('dinc_hearts'));
           action = 'unhearted';
         } else {
-          user.hearts.push(writing.id);
-          writing.hearts += 1;
+          user.update({"$addToSet": {hearts: writing._id}}, {}, cb_join.add_fn('add_heart'));
+          writing.update({"$inc": {hearts: 1}}, {}, cb_join.add_fn('inc_hearts'));
           action = 'hearted';
         }
-        writing.save();
-        user.save();
-        res.send({err: false, updated: true, hearted: true, action: action});
+        cb_join.join(function(err, data){
+          if (err){ throw err; }
+          res.send({err: false, updated: true, action: action});
+        })
       })
     });
   } catch (e){
@@ -147,32 +183,40 @@ exports.me = function(req, res){
       }
       var hearts = [], authored = [];
       writings.forEach(function(writing){
-        if (user.hearts.indexOf(writing._id) != -1){
+        if (user.writings.indexOf(writing._id) != -1){
           authored.push(writing);
         }
-        if (user.writings.indexOf(writing._id) != -1){
+        if (user.hearts.indexOf(writing._id) != -1){
           hearts.push(writing);
         }
-      })
+      });
       res.render('you', {user: user, writings: authored, hearts: hearts, found: true})
     })
   });
 }
 
-exports.save_my_username = function(req, res){
+exports.save_profile_opts = function(req, res){
   try {
     fetch_user(req, false, function(err, user){
-      if (!user){ throw err; }
-      if (req.body['username']){
-        user.username = req.body['username'];
-        user.save(function(err, resp){
-          if (err){ throw err; }
-          res.send({err: false, success: true});
-        })
+      if (!user){ throw err || "Can't find user"; }
+      if (req.body['data']){
+        if (req.path.indexOf('username') != -1){
+          user.username = req.body['data'];
+        } else if (req.path.indexOf('pen_name') != -1) {
+          user.pen_name = req.body['data'];
+        } else {
+          throw "Improper url";
+        }
+      } else {
+        throw "No data with update";
       }
+      user.save(function(err, resp){
+        if (err){ throw err || 'Unable to update [db error].'; }
+        res.send({err: false, success: true});
+      });
     })
   } catch (e){
-    res.send({err: true, success: false})
+    res.send({err: e, success: false})
   }
 }
 
@@ -203,9 +247,39 @@ exports.get_writing = function(req, res){
   });
 };
 
+exports.update_writing = function(req, res){
+  try {
+    fetch_user(req, false, function(err, user){
+      if (err || !user){ throw err; }
+      Writing.findById(req.params.id, function(err, writing){
+        if (err || !writing){ throw err; }
+        if (req.body['make_public']){
+          writing.is_public = true;
+          writing.pen_name = user.pen_name;
+          if (req.body['pen_name'] && req.body['pen_name'].length > 0){
+            writing.pen_name = req.body['pen_name'];
+            user.update({$set: {'pen_name': req.body['pen_name']}}, {}, function(err, resp){
+              if (err){ throw err; };
+            });
+          } else if (!user.pen_name || user.pen_name.length == 0){
+            throw 'Pen Name required';
+          }
+        } else if (req.body['make_private']){
+          writing.is_public = false;
+        }
+        writing.save(function(err, data){
+          if (err){ throw err; }
+          res.render('writing', {writing:writing, user:user, flash: 'Updated Writing'})
+        })
+      })
+    })
+  } catch(e){
+    res.render('500', {err: e});
+  }
+}
 
 exports.list_writings = function(req, res){
-  Writing.find({}, 'title id', function(err, docs){
+  Writing.find({is_public: true}, 'title pen_name author id', function(err, docs){
     res.render('list_writings', {writings: docs});
   });
 };

@@ -3,15 +3,34 @@ extends layout
 block content
   h3.intro Writing
 
+
+  - if (user && writing && writing.author)
+    form.writing_admin(action='/writing/' + writing.id + '/update', method='POST')
+      fieldset 
+        legend Writing Admin 
+        div This writing is #{writing.is_public ? 'public' : 'unlisted'}.
+        - if (user._id.toString() == writing.author.toString())
+          - if (!writing.is_public)
+            .pen_name
+              span Please provide an author or pen name to make this writing public:
+              .input 
+              label(for='pen_name') Pen Name: 
+                input(type='text', name='pen_name', id='pen_name', value=user.pen_name)/
+            input(type='submit', value='List on Site', name='make_public')/
+          - else
+            input(type='submit', value='Remove listing (make private).', name='make_private')
+
+
   .writing.single(mid=writing.id)
     h3= writing.title
     .body loading...
     .actions.toolbar
       .act
-        - if (!user || (user && user.hearts.indexOf(writing.id) == -1))
+        div.heart(class=(user && user.hearts.indexOf(writing._id) != -1) ? 'hide' : '')
           a.heart_this(href='#', writing_id=writing.id) ♥ it.
-        - else
-          span.hearted hearted
+        div.unheart(class=(!user || user.hearts.indexOf(writing._id) == -1) ? 'hide' : '')
+          span.hearted hearted 
+          a.heart_this(href='#', writing_id=writing.id) ✖
       .act.sep |
       .act
         a(href='/writing/'+writing.id+'/share') share it.

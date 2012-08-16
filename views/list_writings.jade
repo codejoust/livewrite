@@ -5,7 +5,10 @@ block content
 
   h3.intro All Writings
 
-  .writings
+  ul.writings
     - for writing in writings
-      h3
-        a(href='/writing/' + writing.id)=writing.title
+      li.writing
+        a(href='/writing/' + writing.id)
+          span.title= writing.title
+        - if (writing.pen_name)
+          div.author= writing.pen_name
