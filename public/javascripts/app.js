@@ -99,7 +99,32 @@ $(function(){
 	 //...\\
 	// ... \\
 
+	$('.heart_this').click(function(){
+		var link = $(this);
+		$.post('/writing/'+writing._id+'/heart', function(resp){
+			if (resp && resp.hearted){
+				writing.hearts += 1;
+				$('.hearts_counter').html(writing.hearts);
+				link.parent().html('hearted');
+			}
+		});
+	});
 
+	$('.save_uname').click(function(){
+		var user_input = $('.user_input');
+		if (user_input.val()){
+			$.post('/me/username', {username: user_input.val()}, function(resp){
+				if (resp && !resp.err){
+					alert('saved username :).');
+				} else {
+					alert('error updating username. it may be already taken.')
+				}
+			});
+		} else {
+			alert('please type in a username.')
+			user_input.focus();
+		}
+	});
 
 	if ($('#new_post').length){
 

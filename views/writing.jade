@@ -8,7 +8,10 @@ block content
     .body loading...
     .actions.toolbar
       .act
-        a(href='/writing/'+writing.id+'/heart') ♥ it.
+        - if (!user || (user && user.hearts.indexOf(writing.id) == -1))
+          a.heart_this(href='#', writing_id=writing.id) ♥ it.
+        - else
+          span.hearted hearted
       .act.sep |
       .act
         a(href='/writing/'+writing.id+'/share') share it.
@@ -16,6 +19,10 @@ block content
       .act
         span.views_counter= writing.views 
         span  views
+      .act.sep |
+      .act
+        span.hearts_counter= writing.hearts
+        span  hearts
       .act.sep |
       .act
         span.speed.selected(speed='1') 1x 

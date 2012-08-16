@@ -2,10 +2,27 @@ extends layout
 
 block content
 
-  h3.intro You
+  h3.intro About You
 
-  p You've written:
-    ul 
-      - for writing in writings
-        li
-          a(href='/writing/'+writing.id)= writing.title || 'untitled.'
+
+
+  - if (found)
+
+    div.username
+      span username: 
+      input.user_input(type='text', placeholder='anonymous', value=user.username)/
+      input.save_uname(type='button', value='save')/
+
+    p You've written:
+      ul 
+        - for writing in writings
+          li
+            a(href='/writing/'+writing.id)= writing.title || 'untitled.'
+
+    p You've hearted:
+      ul
+        - for heart in hearts
+          li
+            a(href='/writing/' + heart.id)= heart.title || 'untitled.'
+  - else
+    h3 Can't find user. Write something or heart a writing to 

@@ -39,6 +39,7 @@ app.post('/writing/:id/heart',  routes.heart_writing);
 app.get( '/writing/:id.json',   routes.get_writing);
 app.get( '/writings',           routes.list_writings);
 app.get( '/me',                 routes.me);
+app.post('/me/username',        routes.save_my_username);
 
 
 http.createServer(app).listen(app.get('port'), function(){
