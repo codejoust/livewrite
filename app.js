@@ -6,14 +6,16 @@
 var express = require('express')
   , http = require('http')
   , path = require('path')
+  , mongoose = require('mongoose')
   , MongoStore = require('express-session-mongo')
   , auth = require('connect-auth')
-  , common = require('./common')
-  , models = require('./models')
-  , fs = require('fs');
+  , common = require('./lib/common');
 
-var app = express()
-  , models = require('./models', common.loadConfig('db').path, app);
+var app = express();
+
+var schemas = require('./models')(common.loadConfig('db').path, mongoose);
+mongoose.model('User', schemas.User);
+mongoose.model('Writing', schemas.Writing);
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -55,12 +57,16 @@ app.configure('development', function(){
 });
 
 
-var routes = require('./routes/index');
-  , login_routes = require('./routes/session');
+var routes      = require('./routes/index')
+  , sess_routes = require('./routes/session');
 
-/* Site Mappings */
+/* Site HTTP Mappings */
+
+// site routes
 app.get( '/',                   routes.index);
 app.get( '/about',              routes.about);
+
+// writing routes
 app.post('/writing',            routes.add_writing);
 app.get( '/writing/:id',        routes.get_writing);
 app.post('/writing/:id/view',   routes.view_writing);
@@ -68,19 +74,15 @@ app.post('/writing/:id/heart',  routes.heart_writing);
 app.post('/writing/:id/update', routes.update_writing);
 app.get( '/writing/:id.json',   routes.get_writing);
 app.get( '/writings',           routes.list_writings);
+// user routes
 app.get( '/me',                 routes.me);
 app.post('/me/pen_name',        routes.save_profile_opts);
 app.post('/me/username',        routes.save_profile_opts);
 app.post('/me/email',           routes.save_profile_opts);
+
+// session routes
 app.get ('/login',         sess_routes.login);
 app.get ('/logout',        sess_routes.logout);
-
-
-
-
-
-
-
 
 
 http.createServer(app).listen(app.get('port'), function(){

@@ -1,8 +1,34 @@
+utils  = require('./utils.js');
+var _ = require('underscore');
+
+var mongoose = require('mongoose'),
+ models = {
+    User: mongoose.model('User'),
+    Writing: mongoose.model('Writing')
+  };
+
 exports.logout = function(req, res){
     req.logout();
-});
+};
 
 exports.login = function(req, res){
+
+  function finish_create(user, fb_info){
+    user.has_login = true;
+    user.remote_id = fb_info['id'];
+    if (fb_info['email']){ user.email = fb_info['email']; }
+    if (fb_info['name'] ){ user.realname = fb_info['name']; }
+    if (req.session["access_token"]){ user.remote_token = req.session["access_token"]; }
+    if (fb_info['email']){ user.email = fb_info['email']; }
+    user.save(function(err, doc){
+      if (!err){
+        res.send('logged in');
+      } else {
+        res.send('error logging in ')
+      }
+    });
+  }
+
     req.authenticate(['facebook'], function(error, authenticated){
         console.log(arguments);
         if( error ) {
@@ -21,21 +47,28 @@ exports.login = function(req, res){
 
                 if (req.isAuthenticated()){
                   var fb_info = req.session.auth.user;
-                  utils.fetch_user(req, false, function(err, doc){
-                    if (err){ req.send('Err! '+err); return false; }
-                    if (!doc){
-                      user = new models.User();
-                      user.created_at = new Date();
-                      user.created_ip = get_ip(req);
-                    }
-                    user.has_login = true;
-                    user.remote_id = fb_info['id'];
-                    if (fb_info['email']){ user.email = fb_info['email']; }
-                    user.save(function(err, doc){
-                      if (!err){
-                        res.send('logged in');
+                  utils.fetch_user(req, true, function(err, user){
+                    if (err || !user){ res.send('Err! '+err + ' u:' +JSON.stringify(user)); return false; }
+                    models.User.findOne({'remote_id': fb_info['id']}, function(err, old_user){
+                      if (old_user){
+                        models.Writing.find({author: user._id}, '_id id', function(err, docs){
+                          if (err){ console.error('BIG ERROR!!! CANNOT MOVE WRITINGS.'); res.send('err finding writings'); return; }
+                          models.Writing.update({author: user._id}, {author: old_user._id}, function(err, update_prog){
+                            if (err){ console.error('BIG ERROR!!! CANNOT MOVE WRITINGS.'); res.send('err updating writings'); return; }
+                            old_user.hearts   = _.union(old_user.hearts, user.hearts); 
+                            old_user.writings = _.pluck(docs, '_id');
+                            user.remove(function(err, doc){
+                              req.session['user_id'] = 'uid:' + old_user._id;
+                              if (err){ res.send('ERR!' + err); return; }
+                              old_user.save(function(err,resp){
+                                if (err){ res.send('cannot create new user'); console.err(['cannot create new user for switchover', old_user, user]); return; }
+                                finish_create(resp, fb_info);
+                              })
+                            })
+                          })   
+                        });
                       } else {
-                        res.send('error logging in ')
+                        finish_create(user, fb_info);
                       }
                     });
                   })
@@ -44,4 +77,4 @@ exports.login = function(req, res){
                 }
             }
         }});
-});
+};

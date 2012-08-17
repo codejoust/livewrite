@@ -1,10 +1,9 @@
-module.exports = function(connect_path, app){
+module.exports = function(connect_path, mongoose){
 
-  var mongoose = require('mongoose')
-    , models = {};
-  mongoose.connect('mongodb://localhost/livewrite');
+  var schemas = {};
+  mongoose.connect(connect_path);
 
-  var WritingS = new mongoose.Schema({
+  schemas.Writing = new mongoose.Schema({
   	title:  String,
   	body:  [String],
   	live: {
@@ -22,10 +21,8 @@ module.exports = function(connect_path, app){
   	hearts:      {type: Number, default: 0},
   	tags:        [String]
   });
-  models.Writing = mongoose.model('Writing', WritingS);
 
-
-  var UserS = new mongoose.Schema({
+  schemas.User = new mongoose.Schema({
     has_login: {type: Boolean, default: false},
     created_at: Date,
     created_ip: String,
@@ -40,11 +37,7 @@ module.exports = function(connect_path, app){
     hearts: [mongoose.Schema.ObjectId],
     writings: [mongoose.Schema.ObjectId]
   });
-  models.User = mongoose.model('User', UserS);
 
-  if (app){
-    app.set('models', models);
-  }
-  return models;
+  return schemas;
 
 }

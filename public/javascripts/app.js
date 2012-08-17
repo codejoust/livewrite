@@ -142,7 +142,7 @@ $(function(){
   $('.save_pref').click(function(){
     var user_input = $(this).parent().find('input.text');
     var type = $(this).attr('form_type')
-    if (user_input.val()){
+    if (type == 'email' || user_input.val()){
       $.post($(this).attr('submit_url'), {data: user_input.val()}, function(resp){
         if (resp && !resp.err){
           alert('saved '+type+' :).');

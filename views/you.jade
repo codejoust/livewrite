@@ -8,21 +8,30 @@ block content
   - if (found)
 
     fieldset.user_options
+
       legend User Options
-      div.pen_name
-        div pen name: <small>(shown as the author's name)</small>
-        input.text(type='text', placeholder='anonymous', value=user.pen_name)/
-        input.save_pref(type='button', value='save', form_type='pen name', submit_url='/me/pen_name')/
 
-      div.username
-        div user name: <small>(url for your author's profile)</small>
-        input.text(type='text', placeholder=user._id, value=user.username)/
-        input.save_pref(type='button', value='save', form_type='user name', submit_url='/me/username')/
+      p.fb
+        - if (user.has_login)
+          span You are connected with facebook.
+        - else
+          a(href='/login') connect with facebook to preserve account or change options.
 
-      div.email
-        div email: <small>(for your password)</small>
-        input.text(type='text', value=user.email)/
-        input.save_pref(type='button', value='save', from_type='email', submit_url='/me/email')
+      - if (user.has_login)
+        div.pen_name
+          div pen name: <small>(shown as the author's name)</small>
+          input.text(type='text', placeholder='anonymous', value=user.pen_name)/
+          input.save_pref(type='button', value='save', form_type='pen name', submit_url='/me/pen_name')/
+
+        div.username
+          div user name: <small>(url for your author's profile)</small>
+          input.text(type='text', placeholder=user._id, value=user.username)/
+          input.save_pref(type='button', value='save', form_type='user name', submit_url='/me/username')/
+
+        div.email
+          div email: <small>(for your password)</small>
+          input.text(type='text', value=user.email, disabled=true)/
+          input.save_pref(type='button', value='update from facebook', form_type='email', submit_url='/me/email')
 
 
     p You've written:
