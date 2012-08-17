@@ -19,6 +19,12 @@ block content
         input.text(type='text', placeholder=user._id, value=user.username)/
         input.save_pref(type='button', value='save', form_type='user name', submit_url='/me/username')/
 
+      div.email
+        div email: <small>(for your password)</small>
+        input.text(type='text', value=user.email)/
+        input.save_pref(type='button', value='save', from_type='email', submit_url='/me/email')
+
+
     p You've written:
       ul 
         - for writing in writings

@@ -68,13 +68,16 @@ var Writing = mongoose.model('Writing', WritingS);
 
 
 var UserS = new mongoose.Schema({
-  has_session: Boolean,
+  has_login: {type: Boolean, default: false},
   created_at: Date,
   created_ip: String,
   last_ip: String,
   realname: String,
+  remote_id: String,
+  remote_token: String,
   pen_name: String,
-  username: {type: String, unique: true},
+  email: String,
+  username: String,
   bio: String,
   hearts: [mongoose.Schema.ObjectId],
   writings: [mongoose.Schema.ObjectId]
@@ -137,8 +140,8 @@ exports.heart_writing = function(req, res){
 }
 
 function fetch_user(req, create, cb){
-  if (req.cookies['user_id'] && req.cookies['user_id'].length>10){
-    User.findById(req.cookies['user_id'].slice(4), function(err,doc){
+  if (req.session['user_id'] && req.session['user_id'].length>10){
+    User.findById(req.session['user_id'].slice(4), function(err,doc){
       cb(err, doc);
     });
   } else {
@@ -147,6 +150,7 @@ function fetch_user(req, create, cb){
       user.created_at = new Date();
       user.created_ip = get_ip(req);
       user.save(function(err, doc){
+        if (!err){ req.session['user_id'] = 'uid:' + user.id; }
         cb(err, doc);
       });
     } else {
@@ -158,8 +162,7 @@ function fetch_user(req, create, cb){
 exports.add_writing = function(req, res){
   fetch_user(req, true, function(err, user){
     if (user && !err){
-      res.cookie('user_id', 'uid:' + user.id, {maxAge: 1000*3600*24*100, httpOnly: true});
-      create_writing(req, res, user);
+     create_writing(req, res, user);
     } else {
       res.send({err: err, err_at: 'User Create'})
     }
@@ -195,6 +198,20 @@ exports.me = function(req, res){
   });
 }
 
+
+exports.login_with_code = function(req, res){
+  if (req.body.code && req.body.email){
+    User.findOne({code: req.body.code, email: req.body.email}, function(err, user){
+      if (!err && user){
+        req.session.user_id = 'uid:' + user._id;
+        res.send('successfully logged in');
+      } else {
+        res.send('an error was encountered finding your account.');
+      }
+    })
+  }
+}
+
 exports.save_profile_opts = function(req, res){
   try {
     fetch_user(req, false, function(err, user){
@@ -204,6 +221,8 @@ exports.save_profile_opts = function(req, res){
           user.username = req.body['data'];
         } else if (req.path.indexOf('pen_name') != -1) {
           user.pen_name = req.body['data'];
+        } else if (req.path.indexOf('email') != -1) {
+          user.email = req.body['data'].toLowerCase();
         } else {
           throw "Improper url";
         }

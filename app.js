@@ -4,11 +4,16 @@
  */
 
 var express = require('express')
-  , routes = require('./routes')
   , http = require('http')
-  , path = require('path');
+  , path = require('path')
+  , MongoStore = require('express-session-mongo')
+  , auth = require('connect-auth')
+  , common = require('./common')
+  , models = require('./models')
+  , fs = require('fs');
 
-var app = express();
+var app = express()
+  , models = require('./models', common.loadConfig('db').path, app);
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
@@ -19,7 +24,27 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  //app.use(express.session({secret: 'aw4tji4#TALKASDnaergawreILRAEIJAalwker'}));
+  app.use(express.session({
+    secret: 'aw4tji4#TALKASDnaergawreILRAEIJAalwker',
+    store: new MongoStore({
+      db: 'livewrite',
+      collection: 'sessions',
+      reapInterval: 86400000 * 200
+    }),
+    cookie: {maxAge: 86400000 * 200} // 200 days.
+  }));
+
+  var auth_config = common.loadConfig('auth');
+  app.use(auth({
+          strategies : [
+              auth.Facebook(auth_config.facebook)
+             // , auth.Twitter(app.settings.twitter)
+          ],
+          trace: true,
+          logoutHandler: require('connect-auth/lib/events').redirectOnLogout("/")
+      })
+  );
+
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -28,6 +53,10 @@ app.configure(function(){
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
+
+
+var routes = require('./routes/index');
+  , login_routes = require('./routes/session');
 
 /* Site Mappings */
 app.get( '/',                   routes.index);
@@ -42,6 +71,16 @@ app.get( '/writings',           routes.list_writings);
 app.get( '/me',                 routes.me);
 app.post('/me/pen_name',        routes.save_profile_opts);
 app.post('/me/username',        routes.save_profile_opts);
+app.post('/me/email',           routes.save_profile_opts);
+app.get ('/login',         sess_routes.login);
+app.get ('/logout',        sess_routes.logout);
+
+
+
+
+
+
+
 
 
 http.createServer(app).listen(app.get('port'), function(){
