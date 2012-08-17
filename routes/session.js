@@ -22,8 +22,8 @@ exports.login = function(req, res){
     if (fb_info['email']){ user.email = fb_info['email']; }
     user.save(function(err, doc){
       if (!err){
-        if (!req.params.back_path){ req.params.back_path = '/me'; }
-        res.redirect(req.params.back_path);
+        if (!req.query.back_path){ req.query.back_path = '/me'; }
+        res.redirect('//' + req.headers.host + req.query.back_path);
       } else {
         res.send('error logging in ')
       }
