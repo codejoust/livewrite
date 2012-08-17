@@ -47,6 +47,9 @@ app.configure(function(){
       })
   );
 
+  app.set('app_info', common.loadConfig('app'));
+  app.get('app_info').url_start;
+
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));

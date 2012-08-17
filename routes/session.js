@@ -1,5 +1,6 @@
 utils  = require('./utils.js');
 var _ = require('underscore');
+var common = require('../lib/common');
 
 var mongoose = require('mongoose'),
  models = {
@@ -23,7 +24,7 @@ exports.login = function(req, res){
     user.save(function(err, doc){
       if (!err){
         if (!req.query.back_path){ req.query.back_path = '/me'; }
-        res.redirect('//' + req.headers.host + req.query.back_path);
+        res.redirect(common.loadConfig('app').url_start + req.query.back_path);
       } else {
         res.send('error logging in ')
       }
