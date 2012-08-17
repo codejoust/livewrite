@@ -22,7 +22,8 @@ exports.login = function(req, res){
     if (fb_info['email']){ user.email = fb_info['email']; }
     user.save(function(err, doc){
       if (!err){
-        res.send('logged in');
+        if (!req.params.back_path){ req.params.back_path = '/me'; }
+        res.redirect(req.params.back_path);
       } else {
         res.send('error logging in ')
       }
@@ -50,7 +51,7 @@ exports.login = function(req, res){
                   utils.fetch_user(req, true, function(err, user){
                     if (err || !user){ res.send('Err! '+err + ' u:' +JSON.stringify(user)); return false; }
                     models.User.findOne({'remote_id': fb_info['id']}, function(err, old_user){
-                      if (old_user){
+                      if (old_user && user._id != user._id){
                         models.Writing.find({author: user._id}, '_id id', function(err, docs){
                           if (err){ console.error('BIG ERROR!!! CANNOT MOVE WRITINGS.'); res.send('err finding writings'); return; }
                           models.Writing.update({author: user._id}, {author: old_user._id}, function(err, update_prog){
@@ -61,7 +62,7 @@ exports.login = function(req, res){
                               req.session['user_id'] = 'uid:' + old_user._id;
                               if (err){ res.send('ERR!' + err); return; }
                               old_user.save(function(err,resp){
-                                if (err){ res.send('cannot create new user'); console.err(['cannot create new user for switchover', old_user, user]); return; }
+                                if (err){ res.send('cannot create new user'); console.error(['cannot create new user for switchover', old_user, user]); return; }
                                 finish_create(resp, fb_info);
                               })
                             })

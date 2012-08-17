@@ -21,7 +21,7 @@ block content
             - else
               input(type='submit', value='Remove listing (make private).', name='make_private')
         - else
-          please <a href='/login'>login with facebook</a> to publish.
+          please <a href='/login?back_path=#{encodeURIComponent('/writing/' + writing.id)}'>login with facebook</a> to publish.
 
 
   .writing.single(mid=writing.id)

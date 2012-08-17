@@ -84,7 +84,6 @@ app.post('/me/email',           routes.save_profile_opts);
 app.get ('/login',         sess_routes.login);
 app.get ('/logout',        sess_routes.logout);
 
-
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });

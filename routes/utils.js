@@ -74,7 +74,6 @@ helpers.fetch_user = function(req, create, cb){
     user.created_ip = helpers.get_ip(req);
     user.save(function(err, doc){
       if (!err){ req.session['user_id'] = 'uid:' + user.id; }
-      console.log(['user?', err, doc]);
       cb(err, user);
     });
   }
@@ -84,7 +83,7 @@ helpers.fetch_user = function(req, create, cb){
         req.session['user_id'] = null;
         console.error('>>> \n Nonexistent User!!!\n <<<<');
         if (create){
-          mk_user();
+          mk_user();5
         } else {
           cb('Nonexistent User', null);
         }
