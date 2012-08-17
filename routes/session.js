@@ -24,7 +24,7 @@ exports.login = function(req, res){
     user.save(function(err, doc){
       if (!err){
         if (!req.query.back_path){ req.query.back_path = '/me'; }
-        res.redirect(common.loadConfig('app').url_start + req.query.back_path);
+        res.redirect(common.loadConfig('app').url_start + req.query.back_path.slice(1));
       } else {
         res.send('error logging in ')
       }
