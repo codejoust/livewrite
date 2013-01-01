@@ -83,7 +83,7 @@ helpers.fetch_user = function(req, create, cb){
         req.session['user_id'] = null;
         console.error('>>> \n Nonexistent User!!!\n <<<<');
         if (create){
-          mk_user();5
+          mk_user();
         } else {
           cb('Nonexistent User', null);
         }

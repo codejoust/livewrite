@@ -7,7 +7,6 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , mongoose = require('mongoose')
-  , MongoStore = require('express-session-mongo')
   , auth = require('connect-auth')
   , common = require('./lib/common');
 
@@ -18,6 +17,10 @@ mongoose.model('User', schemas.User);
 mongoose.model('Writing', schemas.Writing);
 
 app.configure(function(){
+
+  app.set('app_info', common.loadConfig('app'));
+  app.get('app_info').url_start;
+
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
@@ -27,12 +30,7 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({
-    secret: 'aw4tji4#TALKASDnaergawreILRAEIJAalwker',
-    store: new MongoStore({
-      db: 'livewrite',
-      collection: 'sessions',
-      reapInterval: 86400000 * 200
-    }),
+    secret: app.get('app_info').sess_secret,
     cookie: {maxAge: 86400000 * 200} // 200 days.
   }));
 
@@ -40,15 +38,12 @@ app.configure(function(){
   app.use(auth({
           strategies : [
               auth.Facebook(auth_config.facebook)
-             // , auth.Twitter(app.settings.twitter)
           ],
           trace: true,
           logoutHandler: require('connect-auth/lib/events').redirectOnLogout("/")
       })
   );
 
-  app.set('app_info', common.loadConfig('app'));
-  app.get('app_info').url_start;
 
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));

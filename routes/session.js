@@ -9,6 +9,7 @@ var mongoose = require('mongoose'),
   };
 
 exports.logout = function(req, res){
+    req.session.user_id = null;
     req.logout();
 };
 
@@ -32,7 +33,6 @@ exports.login = function(req, res){
   }
 
     req.authenticate(['facebook'], function(error, authenticated){
-        console.log(arguments);
         if( error ) {
             // Something has gone awry, behave as you wish.
             console.log(error);
@@ -43,7 +43,6 @@ exports.login = function(req, res){
                 // The authentication strategy requires some more browser interaction, suggest you do nothing here!
             }
             else {
-                console.log(arguments);
                 // We've either failed to authenticate, or succeeded (req.isAuthenticated() will confirm, as will the value of the received argument)
                 //next();
 
